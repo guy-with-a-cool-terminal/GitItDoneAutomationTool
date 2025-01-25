@@ -1,0 +1,4 @@
+gitdb==4.0.12
+GitPython==3.1.44
+pyfiglet==1.0.2
+smmap==5.0.2
