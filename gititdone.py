@@ -112,32 +112,48 @@ except GitCommandError as e:
 current_branch = repo.active_branch.name
 
 # push changes to specified remote and current branch
-try:
-    origin = None
-    for remote in repo.remotes:
-        if remote.name == args.remote:
-            origin = remote
-            break
-    
-    if origin is None:
-        print(f"Error: Remote '{args.remote}' not found.")
-        exit(1)
-    
-    # check if local branch is up to date with remote before pushing
-    remote_ref = f"origin/{current_branch}"
-    local_commit = repo.commit(current_branch)
-    remote_commit = repo.commit(remote_ref)
-    
-    if local_commit.hexsha != remote_commit.hexsha:
-        print(f"Local branch '{current_branch}' is out of sync with remote.")
-        print("Fetching latest changes from remote...")
+def push_changes_to_remote(repo, remote_name, branch_name):
+    """
+    Push changes to the specified remote and branch. Handles:
+    - Remote branch creation if it doesn't exist.
+    - Local/remote branch sync checks.
+    """
+    try:
+        # Find the remote
+        origin = next((remote for remote in repo.remotes if remote.name == remote_name), None)
+        if origin is None:
+            print(f"Error: Remote '{remote_name}' not found.")
+            exit(1)
+
+        # Fetch the latest from remote
         origin.fetch()
-        repo.git.pull("origin",current_branch)  # pull changes to avoid conflicts
-        print('pulled latest changes from remote.')
-    
-    # push after sync check
-    origin.push(refspec=f"{current_branch}:{current_branch}")
-    print(f"\nChanges pushed to {args.remote}/{current_branch}")
-except GitCommandError as e:
-    print(f"Error during push: {e}")
-    exit(1)
+        print(f"Fetched latest updates from remote '{remote_name}'.")
+
+        # Check if the branch exists on the remote
+        remote_ref = f"{remote_name}/{branch_name}"
+        remote_branch_exists = remote_ref in [ref.name for ref in origin.refs]
+
+        # Compare commits if the remote branch exists
+        if remote_branch_exists:
+            local_commit = repo.commit(branch_name)
+            remote_commit = repo.commit(remote_ref)
+
+            if local_commit.hexsha != remote_commit.hexsha:
+                print(f"Local branch '{branch_name}' is out of sync with remote '{remote_name}'.")
+                print("Pulling latest changes to sync...")
+                repo.git.pull(remote_name, branch_name)
+                print(f"Successfully pulled latest changes for branch '{branch_name}'.")
+
+        # Publish the branch if it doesn't exist
+        else:
+            print(f"Remote branch '{branch_name}' does not exist. Publishing it now.")
+            origin.push(refspec=f"{branch_name}:{branch_name}")
+            print(f"Branch '{branch_name}' published to remote '{remote_name}'.")
+
+        # Push local changes to remote
+        origin.push(refspec=f"{branch_name}:{branch_name}")
+        print(f"Changes successfully pushed to {remote_name}/{branch_name}.")
+
+    except GitCommandError as e:
+        print(f"Error during push operation: {e}")
+        exit(1)
