@@ -111,11 +111,11 @@ except GitCommandError as e:
 # get current branch name
 current_branch = repo.active_branch.name
 
-# push changes to specified remote and current branch
 def push_changes_to_remote(repo, remote_name, branch_name):
     """
     Push changes to the specified remote and branch. Handles:
     - Remote branch creation if it doesn't exist.
+    - Sets upstream tracking for non-main branches.
     - Local/remote branch sync checks.
     """
     try:
@@ -133,8 +133,13 @@ def push_changes_to_remote(repo, remote_name, branch_name):
         remote_ref = f"{remote_name}/{branch_name}"
         remote_branch_exists = remote_ref in [ref.name for ref in origin.refs]
 
-        # Compare commits if the remote branch exists
-        if remote_branch_exists:
+        # Publish the branch if it doesn't exist on the remote
+        if not remote_branch_exists:
+            print(f"Remote branch '{branch_name}' does not exist. Publishing it now.")
+            repo.git.push("--set-upstream", remote_name, branch_name)
+            print(f"Branch '{branch_name}' is now tracked with remote '{remote_name}'.")
+        else:
+            # Sync the branch if remote branch exists
             local_commit = repo.commit(branch_name)
             remote_commit = repo.commit(remote_ref)
 
@@ -144,14 +149,8 @@ def push_changes_to_remote(repo, remote_name, branch_name):
                 repo.git.pull(remote_name, branch_name)
                 print(f"Successfully pulled latest changes for branch '{branch_name}'.")
 
-        # Publish the branch if it doesn't exist
-        else:
-            print(f"Remote branch '{branch_name}' does not exist. Publishing it now.")
-            origin.push(refspec=f"{branch_name}:{branch_name}")
-            print(f"Branch '{branch_name}' published to remote '{remote_name}'.")
-
         # Push local changes to remote
-        origin.push(refspec=f"{branch_name}:{branch_name}")
+        repo.git.push(remote_name, branch_name)
         print(f"Changes successfully pushed to {remote_name}/{branch_name}.")
 
     except GitCommandError as e:
