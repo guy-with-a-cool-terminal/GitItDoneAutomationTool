@@ -119,22 +119,28 @@ if args.merge:
         
         # switch to main branch for merging
         main_branch = repo.heads.main if 'main' in repo.heads else repo.heads.master
-        repo.git.checkout(main_branch)
-        print(f"switched to {main_branch} branch.")
+        if current_branch != main_branch.name:
+            repo.git.checkout(main_branch)
+            print(f"switched to {main_branch} branch.")
         
         # fetch latest changes from origin
         origin = repo.remotes.origin
         origin.fetch()
         print("fetched latest changes from remote.")
         
-        # pull latest changes from current branch
-        repo.git.pull('origin',current_branch)
-        print(f"pulled latest changes from {current_branch}.")
+        # pull latest changes from target branch
+        repo.git.pull('origin',main_branch.name)
+        print(f"pulled latest changes from {main_branch.name}.")
         
         # merge specified branch
         merge_branch = repo.heads[args.merge]
         repo.git.merge(merge_branch)
         print(f"Successfully merged {args.merge} into {current_branch}.")
+        
+        # After merging, switch back to the working branch
+        repo.git.checkout(current_branch)
+        print(f"Switched back to {current_branch} branch.")
+
     except GitCommandError as e:
         print(f"Error during merge: {e}")
 repo.git.add(A=True)
