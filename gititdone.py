@@ -68,56 +68,9 @@ args = parser.parse_args()
 # display welcome message/instructions
 print_welcome_message()
 
-# get commit message
-commit_message = get_commit_message(args.message)
-
-# check if we need to merge branches
-if args.merge:
-    try:
-        # switch to main branch
-        main_branch = repo.heads.main if 'main' in repo.heads else repo.heads.master
-        repo.git.checkout(main_branch)
-        print(f"switched to {main_branch} branch.")
-        
-        # fetch latest changes from remote
-        origin = repo.remotes.origin
-        origin.fetch()
-        print('fetched latest changes from remote.')
-        
-        # check if there are any remote changes to pull
-        current_branch = repo.active_branch.name
-        repo.git.pull('origin',current_branch)
-        print(f"pulled latest changes from {current_branch}..")
-        
-        # merge the specified branch into the current branch
-        merge_branch = repo.heads[args.merge]
-        repo.git.merge(merge_branch)
-        print(f"Successfully merged {args.merge} into {current_branch}.")
-    except GitCommandError as e:
-        print(f"Error during merge: {e}")
-        exit(1)
-
-# add all changes
-repo.git.add(A=True)
-
-# commit changes
-try:
-    repo.index.commit(commit_message)
-    print(f"\nChanges committed with message: '{commit_message}'")
-except GitCommandError as e:
-    print(f"Error during commit: {e}")
-    exit(1)
-
-# get current branch name
+#  Get the current branch name
 current_branch = repo.active_branch.name
-
 def push_changes_to_remote(repo, remote_name, branch_name):
-    """
-    Push changes to the specified remote and branch. Handles:
-    - Remote branch creation if it doesn't exist.
-    - Sets upstream tracking for non-main branches.
-    - Local/remote branch sync checks.
-    """
     try:
         # Find the remote
         origin = next((remote for remote in repo.remotes if remote.name == remote_name), None)
@@ -156,3 +109,44 @@ def push_changes_to_remote(repo, remote_name, branch_name):
     except GitCommandError as e:
         print(f"Error during push operation: {e}")
         exit(1)
+
+# handle merge logic if --merge is used
+if args.merge:
+    try:
+        # make sure we are working with the current branch
+        current_branch = repo.active_branch.name
+        print(f"currently on branch: {current_branch}")
+        
+        # switch to main branch for merging
+        main_branch = repo.heads.main if 'main' in repo.heads else repo.heads.master
+        repo.git.checkout(main_branch)
+        print(f"switched to {main_branch} branch.")
+        
+        # fetch latest changes from origin
+        origin = repo.remotes.origin
+        origin.fetch()
+        print("fetched latest changes from remote.")
+        
+        # pull latest changes from current branch
+        repo.git.pull('origin',current_branch)
+        print(f"pulled latest changes from {current_branch}.")
+        
+        # merge specified branch
+        merge_branch = repo.heads[args.merge]
+        repo.git.merge(merge_branch)
+        print(f"Successfully merged {args.merge} into {current_branch}.")
+    except GitCommandError as e:
+        print(f"Error during merge: {e}")
+repo.git.add(A=True)
+
+# commit changes
+commit_message = get_commit_message(args.message)
+try:
+    repo.index.commit(commit_message)
+    print(f"\nChanges committed with message: '{commit_message}'")
+except GitCommandError as e:
+    print(f"error during commit: {e}")
+    exit(1)
+
+# push current branch to remote
+push_changes_to_remote(repo,args.remote,current_branch)
