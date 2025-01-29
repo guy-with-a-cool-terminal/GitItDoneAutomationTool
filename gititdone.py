@@ -49,6 +49,7 @@ def print_welcome_message():
     print("  python gititdone.py --remote \"your-remote-name\"          - Pushes to a custom remote (default is 'origin').")
     print("  python gititdone.py --message \"Your custom commit message\" --remote \"your-remote-name\"")
     print("                               - Commits with a custom message and pushes to a custom remote.")
+    print("  python gititdone.py --merge <branchtomerge> \"it will automatically switch to main branch and merge then get back to working branch\"")
     print("\nMake sure your repository is clean and ready for commit before running this tool.")
 
 # initialize git repo
