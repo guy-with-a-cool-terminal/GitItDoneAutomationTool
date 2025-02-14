@@ -138,6 +138,10 @@ if args.merge:
         repo.git.merge(merge_branch)
         print(f"Successfully merged {args.merge} into {current_branch}.")
         
+        # ✅ Push the main/master branch after merging
+        push_changes_to_remote(repo, args.remote, main_branch.name)
+        print(f"Pushed merged changes to {args.remote}/{main_branch.name}.")
+
         # After merging, switch back to the working branch
         repo.git.checkout(current_branch)
         print(f"Switched back to {current_branch} branch.")
