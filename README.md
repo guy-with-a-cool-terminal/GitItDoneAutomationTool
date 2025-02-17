@@ -28,7 +28,7 @@ cd <repository_directory>
 ### 2️⃣ Install Dependencies  
 Make sure you have Python installed. Then, install the required packages:  
 ```bash
-pip install gitpython pyfiglet
+pip install -r requirements.txt
 ```
 
 ---
