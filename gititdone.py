@@ -24,10 +24,17 @@ except git.exc.InvalidGitRepositoryError as e:
     # prompt the user to initialize a repo if not found
     user_input = input("Would you like to initialize a new git repository here? (y/n): ")
     if user_input.lower() == 'y':
+        repo_path = os.getcwd()  # use current directory for new repo
         repo = git.Repo.init(repo_path)
-        print("initialized new repository")
+        print("initialized new repository in:", repo_path)
+        repo = git.Repo(repo_path)
+        print("repository object created successfully")
     else:
         exit(1)
+
+except Exception as e:
+    print(f"an unexpected error occurred: {e}")
+    exit(1)
 
 # get a default commit message with current timestamp
 def get_commit_message(custom_message=None):
