@@ -123,41 +123,58 @@ def push_changes_to_remote(repo, remote_name, branch_name):
 if args.merge_from:
     try:
         # make sure we are working with the current branch
+        from_branch = args.merge_from
         target_branch = args.merge_into if args.merge_into else current_branch
         print(f"currently on branch: {current_branch}")
+        print(f"Preparing to merge from '{from_branch}' into '{target_branch}'...")
         
-        # if merging to another branch we just checkout to that first
-        if target_branch != current_branch:
-            target_branch_ref = repo.heads[target_branch]
-            repo.git.checkout(target_branch_ref)
-            print(f"Switched to branch {target_branch} for merge.")
+        # stash uncommitted changes
+        if repo.is_dirty(untracked_files=True):
+            print("Uncommitted changes detected. Stashing them temporarily...")
+            repo.git.stash('save','Auto-stash before merge')
 
+        # checkout target branch if not already on it
+        if repo.active_branch.name != target_branch:
+            print(f"Switching to target branch '{target_branch}'...")
+            repo.git.checkout(target_branch)
         
-        # fetch latest changes from origin
-        origin = repo.remotes.origin
+        # fetch and ensure both branches are up to date
+        origin = repo.remotes[args.remote]
         origin.fetch()
-        print("fetched latest changes from remote.")
+        print("Fetched latest changes from remote.")
         
-        # pull latest changes from target branch
-        repo.git.pull('origin',target_branch)
-        print(f"pulled latest changes from {target_branch}.")
-        
-        # merge specified  from branch into target branch
-        from_branch = repo.heads[args.merge_from]
+        repo.git.pull(args.remote,target_branch)
+        print(f"Pulled latest changes into '{target_branch}'.")
+
+        if from_branch not in repo.heads:
+            print(f"Local branch '{from_branch}' not found. Checking out from remote...")
+            repo.git.checkout('-b', from_branch, f'{args.remote}/{from_branch}')
+        else:
+            repo.git.checkout(from_branch)
+            repo.git.pull(args.remote, from_branch)
+            repo.git.checkout(target_branch)  # back to target branch
+
+        # merge   
         repo.git.merge(from_branch)
-        print(f"Successfully merged {args.merge_from} into {target_branch}.")
+        print(f"Successfully merged '{from_branch}' into '{target_branch}'.")
         
         # Push the main/master branch after merging
         push_changes_to_remote(repo, args.remote, target_branch)
         print(f"Pushed merged changes to {args.remote}/{target_branch}.")
+        
+        # restore stahed changes if any
+        if repo.git.stash('list'):
+            print("Restoring stashed changes...")
+            repo.git.stash('pop')
 
-        # After merging, switch back to the working branch
+        # return to original working branch
         if target_branch != current_branch:
             repo.git.checkout(current_branch)
             print(f"Switched back to {current_branch} branch.")
 
     except GitCommandError as e:
         print(f"Error during merge: {e}")
+        exit(1)
 
 repo.git.add(A=True)
 
