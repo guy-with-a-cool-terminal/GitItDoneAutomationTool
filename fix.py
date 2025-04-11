@@ -21,7 +21,6 @@ try:
     repo = git.Repo(repo_path)
 except git.exc.InvalidGitRepositoryError as e:
     print(e)
-    # prompt the user to initialize a repo if not found
     user_input = input("Would you like to initialize a new git repository here? (y/n): ")
     if user_input.lower() == 'y':
         repo_path = os.getcwd()  # use current directory for new repo
@@ -77,31 +76,27 @@ args = parser.parse_args()
 # display welcome message/instructions
 print_welcome_message()
 
-#  Get the current branch name
+# Get the current branch name
 current_branch = repo.active_branch.name
+
 def push_changes_to_remote(repo, remote_name, branch_name):
     try:
-        # Find the remote
         origin = next((remote for remote in repo.remotes if remote.name == remote_name), None)
         if origin is None:
             print(f"Error: Remote '{remote_name}' not found.")
             exit(1)
 
-        # Fetch the latest from remote
         origin.fetch()
         print(f"Fetched latest updates from remote '{remote_name}'.")
 
-        # Check if the branch exists on the remote
         remote_ref = f"{remote_name}/{branch_name}"
         remote_branch_exists = remote_ref in [ref.name for ref in origin.refs]
 
-        # Publish the branch if it doesn't exist on the remote
         if not remote_branch_exists:
             print(f"Remote branch '{branch_name}' does not exist. Publishing it now.")
             repo.git.push("--set-upstream", remote_name, branch_name)
             print(f"Branch '{branch_name}' is now tracked with remote '{remote_name}'.")
         else:
-            # Sync the branch if remote branch exists
             local_commit = repo.commit(branch_name)
             remote_commit = repo.commit(remote_ref)
 
@@ -111,7 +106,6 @@ def push_changes_to_remote(repo, remote_name, branch_name):
                 repo.git.pull(remote_name, branch_name)
                 print(f"Successfully pulled latest changes for branch '{branch_name}'.")
 
-        # Push local changes to remote
         repo.git.push(remote_name, branch_name)
         print(f"Changes successfully pushed to {remote_name}/{branch_name}.")
 
@@ -122,36 +116,36 @@ def push_changes_to_remote(repo, remote_name, branch_name):
 # handle merge logic if --merge-from is used
 if args.merge_from:
     try:
-        # make sure we are working with the current branch
-        target_branch = args.merge_into if args .merge_into else current_branch
-        print(f"currently on branch: {current_branch}")
+        # if no target branch is specified, assume the current branch
+        target_branch = args.merge_into if args.merge_into else current_branch
         
-        # if merging to another branch we just checkout to that first
+        print(f"Currently on branch: {current_branch}")
+
+        # If we need to merge into another branch, we will check out that branch
         if target_branch != current_branch:
             target_branch_ref = repo.heads[target_branch]
             repo.git.checkout(target_branch_ref)
             print(f"Switched to branch {target_branch} for merge.")
 
-        
         # fetch latest changes from origin
         origin = repo.remotes.origin
         origin.fetch()
-        print("fetched latest changes from remote.")
-        
+        print("Fetched latest changes from remote.")
+
         # pull latest changes from target branch
-        repo.git.pull('origin',target_branch)
-        print(f"pulled latest changes from {target_branch}.")
-        
-        # merge specified  from branch into target branch
+        repo.git.pull('origin', target_branch)
+        print(f"Pulled latest changes from {target_branch}.")
+
+        # merge the specified "from" branch into the target branch
         from_branch = repo.heads[args.merge_from]
         repo.git.merge(from_branch)
         print(f"Successfully merged {args.merge_from} into {target_branch}.")
-        
-        # Push the main/master branch after merging
+
+        # Push the target branch after merging
         push_changes_to_remote(repo, args.remote, target_branch)
         print(f"Pushed merged changes to {args.remote}/{target_branch}.")
 
-        # After merging, switch back to the working branch
+        # After merging, switch back to the original working branch (if necessary)
         if target_branch != current_branch:
             repo.git.checkout(current_branch)
             print(f"Switched back to {current_branch} branch.")
@@ -159,16 +153,14 @@ if args.merge_from:
     except GitCommandError as e:
         print(f"Error during merge: {e}")
 
-repo.git.add(A=True)
-
-# commit changes
+# Commit changes if any
 commit_message = get_commit_message(args.message)
 try:
     repo.index.commit(commit_message)
     print(f"\nChanges committed with message: '{commit_message}'")
 except GitCommandError as e:
-    print(f"error during commit: {e}")
+    print(f"Error during commit: {e}")
     exit(1)
 
-# push current branch to remote
-push_changes_to_remote(repo,args.remote,current_branch)
+# Push the current branch to the remote
+push_changes_to_remote(repo, args.remote, current_branch)
