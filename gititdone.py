@@ -5,6 +5,8 @@ import pyfiglet
 from datetime import datetime
 from git.exc import GitCommandError
 
+# testing
+
 def find_git_root(starting_path="."):
     """Find the root directory of the Git repository."""
     current_path = os.path.abspath(starting_path)
