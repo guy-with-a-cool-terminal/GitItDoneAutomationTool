@@ -123,7 +123,7 @@ def push_changes_to_remote(repo, remote_name, branch_name):
 if args.merge_from:
     try:
         # make sure we are working with the current branch
-        target_branch = args.merge_into if args .merge_into else current_branch
+        target_branch = args.merge_into if args.merge_into else current_branch
         print(f"currently on branch: {current_branch}")
         
         # if merging to another branch we just checkout to that first
