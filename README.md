@@ -1,5 +1,4 @@
----
-
+```markdown
 # **Git It Done: Automate Your Git Workflow!** 🚀  
 
 ## **Overview**  
@@ -82,7 +81,7 @@ gititdone --message "Your custom message here" --remote "your-remote-name"
 ---
 
 ## **Example Output**  
-``bash
+```bash
 (.venv) ┌─[batman@sudoer]─[~/Desktop/Brian/programming/gititdone]
 └──╼ $ python3 gititdone.py --message "adding installations"
   ____ _ _      ___ _      ____                     _ 
@@ -107,7 +106,7 @@ Usage:
     - Pushes to a custom remote (default is 'origin').
 
   python gititdone.py --message "Your custom commit message" --remote "your-remote-name"  
-    - Commits with a custom message and pushes to a custom remote.
+    - Commits with your custom message and pushes to a custom remote.
 
   python gititdone.py --merge-from <branch> [--merge-into <branch>]  
     - Merges from one branch into the current or specified branch.
@@ -148,3 +147,4 @@ This project is open-source and available under the [MIT License](LICENSE).
 Feel free to fork this repository, make changes, and submit a pull request! Your contributions are welcome. 💡  
 
 ---
+```
