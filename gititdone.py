@@ -171,6 +171,8 @@ if args.merge_from:
         if target_branch != current_branch:
             repo.git.checkout(current_branch)
             print(f"Switched back to {current_branch} branch.")
+        
+        exit(0)
 
     except GitCommandError as e:
         print(f"Error during merge: {e}")
