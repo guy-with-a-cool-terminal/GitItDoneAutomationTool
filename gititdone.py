@@ -46,17 +46,28 @@ def get_commit_message(custom_message=None):
 def print_welcome_message():
     banner = pyfiglet.figlet_format("Git  It  Done !")
     print(banner)
-    print("Welcome to automate Git and rest a bit:) get it ?")
-    print("This tool automates the process of committing and pushing changes to your git repository.")
+    print("Welcome to GitDone! 😊")
+    print("This tool automates the process of committing and pushing changes to your Git repository.")
     print("You can use it as follows:\n")
+    
     print("Usage:")
-    print("  python gititdone.py                - Commits all changes and pushes to the current branch with a default message.")
-    print("  python gititdone.py --message \"Your custom commit message\" - Commits with your custom message.")
-    print("  python gititdone.py --remote \"your-remote-name\"          - Pushes to a custom remote (default is 'origin').")
+    print("  python gititdone.py")
+    print("    - Commits all changes and pushes to the current branch with a default message.")
+    print()
+    print("  python gititdone.py --message \"Your custom commit message\"")
+    print("    - Commits with your custom message.")
+    print()
+    print("  python gititdone.py --remote \"your-remote-name\"")
+    print("    - Pushes to a custom remote (default is 'origin').")
+    print()
     print("  python gititdone.py --message \"Your custom commit message\" --remote \"your-remote-name\"")
-    print("                               - Commits with a custom message and pushes to a custom remote.")
-    print("  python gititdone.py --merge-from <branch> [--merge-into <branch>] - Merges from one branch into the current or specified branch.")
-    print("\nMake sure your repository is clean and ready for commit before running this tool.")
+    print("    - Commits with a custom message and pushes to a custom remote.")
+    print()
+    print("  python gititdone.py --merge-from <branch> [--merge-into <branch>]")
+    print("    - Merges from one branch into the current or specified branch.")
+    print()
+    
+    print("Make sure your repository is clean and ready for commit before running this tool.")
 
 # initialize git repo
 try:
