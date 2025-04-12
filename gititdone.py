@@ -100,6 +100,7 @@ def handle_protected_branch_push(repo, remote_name, target_branch):
         print("\n🔔 ACTION NEEDED:")
         print(f"➡️  Please create a pull request: {pr_url}\n")
          # Auto-delete temp branch locally and remotely
+        repo.git.checkout(target_branch)
         repo.git.branch('-D', temp_branch_name)
         repo.git.push(remote_name, '--delete', temp_branch_name)
         print(f"Temporary branch '{temp_branch_name}' deleted locally and remotely.")
