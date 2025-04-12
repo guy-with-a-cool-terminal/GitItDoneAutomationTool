@@ -24,10 +24,16 @@ except git.exc.InvalidGitRepositoryError as e:
     # prompt the user to initialize a repo if not found
     user_input = input("Would you like to initialize a new git repository here? (y/n): ")
     if user_input.lower() == 'y':
+        repo_path = os.getcwd()  # use current directory for new repo
         repo = git.Repo.init(repo_path)
-        print("initialized new repository")
+        print("initialized new repository in:", repo_path)
+        print("repository object created successfully")
     else:
         exit(1)
+
+except Exception as e:
+    print(f"an unexpected error occurred: {e}")
+    exit(1)
 
 # get a default commit message with current timestamp
 def get_commit_message(custom_message=None):
@@ -49,7 +55,7 @@ def print_welcome_message():
     print("  python gititdone.py --remote \"your-remote-name\"          - Pushes to a custom remote (default is 'origin').")
     print("  python gititdone.py --message \"Your custom commit message\" --remote \"your-remote-name\"")
     print("                               - Commits with a custom message and pushes to a custom remote.")
-    print("  python gititdone.py --merge <branchtomerge> \"it will automatically switch to main branch and merge then get back to working branch\"")
+    print("  python gititdone.py --merge-from <branch> [--merge-into <branch>] - Merges from one branch into the current or specified branch.")
     print("\nMake sure your repository is clean and ready for commit before running this tool.")
 
 # initialize git repo
@@ -63,7 +69,8 @@ except git.exc.InvalidGitRepositoryError:
 parser = argparse.ArgumentParser(description='Automate Git commit and push.')
 parser.add_argument('--message', type=str, help='Custom commit message')
 parser.add_argument('--remote', type=str, default='origin', help='Remote repository name (default: origin)')
-parser.add_argument('--merge',type=str,help='Branch to merge into the current branch')
+parser.add_argument('--merge-from', type=str, help='Branch to merge from')
+parser.add_argument('--merge-into', type=str, help='Branch to merge into (optional, defaults to current branch)')
 args = parser.parse_args()
 
 # display welcome message/instructions
@@ -71,6 +78,34 @@ print_welcome_message()
 
 #  Get the current branch name
 current_branch = repo.active_branch.name
+
+def handle_protected_branch_push(repo, remote_name, target_branch):
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    temp_branch_name = f"merge-{target_branch}-auto-{timestamp}"
+    print(f"Creating temporary branch '{temp_branch_name}' for pull request...")
+
+    repo.git.checkout('-b', temp_branch_name)
+
+    try:
+        repo.git.push(remote_name, temp_branch_name)
+        print(f"Branch '{temp_branch_name}' pushed to remote '{remote_name}'.")
+
+        remote_url = repo.remotes[remote_name].url
+        if remote_url.endswith(".git"):
+            remote_url = remote_url[:-4]
+        if remote_url.startswith("git@github.com:"):
+            remote_url = remote_url.replace("git@github.com:", "https://github.com/")
+
+        pr_url = f"{remote_url}/compare/{target_branch}...{temp_branch_name}"
+        print("\n🔔 ACTION NEEDED:")
+        print(f"➡️  Please create a pull request: {pr_url}\n")
+
+    except GitCommandError as push_error:
+        print(f"Failed to push temporary branch: {push_error}")
+        exit(1)
+    finally:
+        repo.git.checkout(target_branch)
+        
 def push_changes_to_remote(repo, remote_name, branch_name):
     try:
         # Find the remote
@@ -108,55 +143,81 @@ def push_changes_to_remote(repo, remote_name, branch_name):
         print(f"Changes successfully pushed to {remote_name}/{branch_name}.")
 
     except GitCommandError as e:
-        print(f"Error during push operation: {e}")
-        exit(1)
+        if "push declined due to repository rule violations" in str(e):
+            print("Push blocked due to branch protection rules.")
+            handle_protected_branch_push(repo, remote_name, branch_name)
+        else:
+            print(f"Push error: {e}")
+            exit(1)
 
-# handle merge logic if --merge is used
-if args.merge:
+# handle merge logic if --merge-from is used
+if args.merge_from:
     try:
         # make sure we are working with the current branch
-        current_branch = repo.active_branch.name
+        from_branch = args.merge_from
+        target_branch = args.merge_into if args.merge_into else current_branch
         print(f"currently on branch: {current_branch}")
+        print(f"Preparing to merge from '{from_branch}' into '{target_branch}'...")
         
-        # switch to main branch for merging
-        main_branch = repo.heads.main if 'main' in repo.heads else repo.heads.master
-        if current_branch != main_branch.name:
-            repo.git.checkout(main_branch)
-            print(f"switched to {main_branch} branch.")
-        
-        # fetch latest changes from origin
-        origin = repo.remotes.origin
-        origin.fetch()
-        print("fetched latest changes from remote.")
-        
-        # pull latest changes from target branch
-        repo.git.pull('origin',main_branch.name)
-        print(f"pulled latest changes from {main_branch.name}.")
-        
-        # merge specified branch
-        merge_branch = repo.heads[args.merge]
-        repo.git.merge(merge_branch)
-        print(f"Successfully merged {args.merge} into {current_branch}.")
-        
-        # ✅ Push the main/master branch after merging
-        push_changes_to_remote(repo, args.remote, main_branch.name)
-        print(f"Pushed merged changes to {args.remote}/{main_branch.name}.")
+        # stash uncommitted changes
+        if repo.is_dirty(untracked_files=True):
+            print("stashing uncommitted changes...")
+            repo.git.stash('push', '-m', 'Auto-stash before merge')
 
-        # After merging, switch back to the working branch
-        repo.git.checkout(current_branch)
-        print(f"Switched back to {current_branch} branch.")
+        # checkout target branch if not already on it
+        if repo.active_branch.name != target_branch:
+            print(f"Switching to target branch '{target_branch}'...")
+            repo.git.checkout(target_branch)
+        
+        # fetch and ensure both branches are up to date
+        origin = repo.remotes[args.remote]
+        origin.fetch()
+        print("Fetched latest changes from remote.")
+        
+        repo.git.pull(args.remote,target_branch)
+        print(f"Pulled latest changes into '{target_branch}'.")
+
+        if from_branch not in repo.heads:
+            print(f"Local branch '{from_branch}' not found. Checking out from remote...")
+            repo.git.checkout('-b', from_branch, f'{args.remote}/{from_branch}')
+        else:
+            repo.git.checkout(from_branch)
+            repo.git.pull(args.remote, from_branch)
+            repo.git.checkout(target_branch)  # back to target branch
+        
+        # merge   
+        repo.git.merge(from_branch)
+        print(f"Successfully merged '{from_branch}' into '{target_branch}'.")
+        
+        # Push the main/master branch after merging
+        push_changes_to_remote(repo, args.remote, target_branch)
+        print(f"Pushed merged changes to {args.remote}/{target_branch}.")
+        
+        # restore stahed changes if any
+        if repo.git.stash('list'):
+            print("Restoring stashed changes...")
+            repo.git.stash('pop')
+
+        # return to original working branch
+        if target_branch != current_branch:
+            repo.git.checkout(current_branch)
+            print(f"Switched back to {current_branch} branch.")
+        
+        exit(0)
 
     except GitCommandError as e:
         print(f"Error during merge: {e}")
+        exit(1)
+        
+    exit(0)
+# if no merge proceed with commit && push
 repo.git.add(A=True)
-
-# commit changes
 commit_message = get_commit_message(args.message)
 try:
     repo.index.commit(commit_message)
     print(f"\nChanges committed with message: '{commit_message}'")
 except GitCommandError as e:
-    print(f"error during commit: {e}")
+    print(f"commit failed:{e}")
     exit(1)
 
 # push current branch to remote

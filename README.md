@@ -1,65 +1,160 @@
-# Git It Done: Automate Your Git Workflow! 🚀
+# **Git It Done: Automate Your Git Workflow!** 🚀  
 
-## Overview
-**Git It Done** is a Python-based tool designed to simplify your Git workflow. With just a single command, you can automate the process of committing and pushing your changes to a Git repository. Whether you're in the middle of a fast-paced development cycle or just want to save time, this tool has you covered.
-
----
-
-## Features
-- **Automated Commit Messages**: Generate default commit messages with a timestamp or provide your own.
-- **Push to Any Remote**: Specify the remote repository you want to push changes to (defaults to `origin`).
-- **Interactive Instructions**: Displays usage guidance for newcomers.
-- **Error Handling**: Detects invalid repositories, missing remotes, or issues during commits and pushes.
+## **Overview**  
+**Git It Done** is a Python-based tool designed to simplify your Git workflow. With just a single command, you can automate the process of committing and pushing your changes to a Git repository. Whether you're in the middle of a fast-paced development cycle or just want to save time, this tool has you covered.  
 
 ---
 
-## Installation
-1. **Clone the Repository**:
+## **Features**  
+✅ **Automated Commit Messages**: Generate default commit messages with a timestamp or provide your own.  
+✅ **Push to Any Remote**: Specify the remote repository you want to push changes to (defaults to `origin`).  
+✅ **Interactive Instructions**: Displays usage guidance for newcomers.  
+✅ **Error Handling**: Detects invalid repositories, missing remotes, or issues during commits and pushes.  
+
+---
+
+## **Installation**  
+
+### **1️⃣ Clone the Repository**  
+```bash
+git clone <repository_url>
+cd <repository_directory>
+```
+
+### **2️⃣ Install Dependencies**  
+Make sure you have Python installed. Then, install the required packages:  
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## **Making `gititdone.py` Executable from Anywhere**  
+
+### **🔹 Linux/macOS**  
+
+#### **Option 1: System-Wide Installation (Without Virtual Environment)**  
+1. **Ensure the script has a proper shebang** (edit `gititdone.py` and add this at the top if missing):  
+   ```python
+   #!/usr/bin/env python3
+   ```
+2. **Make the script executable**:  
    ```bash
-   git clone <repository_url>
-   cd <repository_directory>
+   chmod +x gititdone.py
+   ```
+3. **Move it to `/usr/local/bin/` to make it globally accessible**:  
+   ```bash
+   sudo mv gititdone.py /usr/local/bin/gititdone
+   ```
+4. **Run it from anywhere**:  
+   ```bash
+   gititdone
    ```
 
-2. **Install Dependencies**:
-   Make sure you have Python installed. Then, install the required packages:
+---
+
+#### **Option 2: Using a Virtual Environment**  
+If you want to run `gititdone.py` inside a **virtual environment**, follow these steps:  
+
+1. **Create and activate a virtual environment** (if not already done):  
    ```bash
-   pip install gitpython pyfiglet
+   python3 -m venv myenv
+   source myenv/bin/activate
+   ```
+2. **Install dependencies inside the virtual environment**:  
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. **Find the path to your virtual environment’s Python**:  
+   ```bash
+   which python3
+   ```
+   Example output:  
+   ```bash
+   /home/your-username/path/to/myenv/bin/python3
+   ```
+4. **Edit the shebang in `gititdone.py` to use the virtual environment’s Python**:  
+   Open `gititdone.py` and replace the first line with:  
+   ```python
+   #!/home/your-username/path/to/myenv/bin/python3
+   ```
+5. **Make the script executable**:  
+   ```bash
+   chmod +x gititdone.py
+   ```
+6. **Move it to `/usr/local/bin/` to use it globally**:  
+   ```bash
+   sudo mv gititdone.py /usr/local/bin/gititdone
+   ```
+7. **Run it as a command**:  
+   ```bash
+   gititdone
    ```
 
 ---
 
-## Usage
+### **🔹 Windows**  
 
-### Basic Command
-To commit all changes and push to the current branch with a default commit message:
+#### **Method 1: Add It to PATH**  
+1. **Move the script to a fixed location**, e.g., `C:\git-tools\`.  
+2. **Add that folder to the system `PATH`**:  
+   - Search *Environment Variables* in the Windows search bar.  
+   - Click *Edit the system environment variables* → *Environment Variables*.  
+   - Under *System Variables*, find `Path`, click *Edit*, then *New*, and add `C:\git-tools\`.  
+3. **Rename the file** to `gititdone.py` and now you can run:  
+   ```powershell
+   gititdone.py
+   ```
+
+#### **Method 2: Create a `.bat` Wrapper**  
+If you want to run the script without typing `.py`:  
+
+1. **Create a `gititdone.bat` file** in `C:\git-tools\` with the following content:  
+   ```bat
+   @echo off
+   python "C:\git-tools\gititdone.py" %*
+   ```
+2. **Move `gititdone.bat` to a folder in PATH** (like `C:\Windows\`).  
+3. Now, you can just type:  
+   ```powershell
+   gititdone
+   ```
+   from anywhere! 🚀  
+
+---
+
+## **Usage**  
+
+### **Basic Command**  
+To commit all changes and push to the current branch with a default commit message:  
 ```bash
-python gititdone.py
+gititdone
 ```
 
-### With a Custom Commit Message
-To commit with a custom message:
+### **With a Custom Commit Message**  
+To commit with a custom message:  
 ```bash
-python gititdone.py --message "Your custom message here"
+gititdone --message "Your custom message here"
 ```
 
-### Push to a Custom Remote
-To push to a remote other than the default `origin`:
+### **Push to a Custom Remote**  
+To push to a remote other than the default `origin`:  
 ```bash
-python gititdone.py --remote "your-remote-name"
+gititdone --remote "your-remote-name"
 ```
 
-### Combine Custom Message and Remote
-You can specify both a custom commit message and a remote:
+### **Combine Custom Message and Remote**  
+You can specify both a custom commit message and a remote:  
 ```bash
-python gititdone.py --message "Your custom message here" --remote "your-remote-name"
+gititdone --message "Your custom message here" --remote "your-remote-name"
 ```
 
 ---
 
-## Example Output
+## **Example Output**  
 ```bash
 (myenv) ┌─[batman@sudoer]─[~/Desktop/Brian/programming/gititdone]
-└──╼ $ python3 gititdone.py 
+└──╼ $ gititdone
   ____ _ _      ___ _      ____                     _ 
  / ___(_) |_   |_ _| |_   |  _ \  ___  _ __   ___  | |
 | |  _| | __|   | || __|  | | | |/ _ \| '_ \ / _ \ | |
@@ -67,45 +162,42 @@ python gititdone.py --message "Your custom message here" --remote "your-remote-n
  \____|_|\__|  |___|\__|  |____/ \___/|_| |_|\___| (_)
                                                       
 
-Welcome to automate Git and rest a bit:) get it ?
+Welcome to automate Git and rest a bit :) Get it?
 This tool automates the process of committing and pushing changes to your git repository.
 You can use it as follows:
 
 Usage:
-  python gititdone.py                - Commits all changes and pushes to the current branch with a default message.
-  python gititdone.py --message "Your custom commit message" - Commits with your custom message.
-  python gititdone.py --remote "your-remote-name"          - Pushes to a custom remote (default is 'origin').
-  python gititdone.py --message "Your custom commit message" --remote "your-remote-name"
+  gititdone                - Commits all changes and pushes to the current branch with a default message.
+  gititdone --message "Your custom commit message" - Commits with your custom message.
+  gititdone --remote "your-remote-name"          - Pushes to a custom remote (default is 'origin').
+  gititdone --message "Your custom commit message" --remote "your-remote-name"
                                - Commits with a custom message and pushes to a custom remote.
 
-Make sure your repository is clean and ready for commit before running this tool.
-
 Changes committed with message: 'Automated commit - 2025-01-25 11:21:23'
-
 ```
 
 ---
 
-## Requirements
-- Python 3.6 or later
-- Git installed and configured
-- Python modules:
-  - `gitpython`
-  - `pyfiglet`
+## **Requirements**  
+- Python 3.6 or later  
+- Git installed and configured  
+- Python modules:  
+  - `gitpython`  
+  - `pyfiglet`  
 
 ---
 
-## Error Handling
-- **Invalid Repository**: Displays an error if the script isn't run within a Git repository.
-- **Missing Remote**: Notifies you if the specified remote doesn't exist.
-- **Commit/Push Failures**: Provides detailed error messages if any Git operation fails.
+## **Error Handling**  
+- **Invalid Repository**: Displays an error if the script isn't run within a Git repository.  
+- **Missing Remote**: Notifies you if the specified remote doesn't exist.  
+- **Commit/Push Failures**: Provides detailed error messages if any Git operation fails.  
 
 ---
 
-## License
-This project is open-source and available under the [MIT License](LICENSE).
+## **License**  
+This project is open-source and available under the [MIT License](LICENSE).  
 
 ---
 
-## Contributing
-Feel free to fork this repository, make changes, and submit a pull request! Your contributions are welcome. 💡
+## **Contributing**  
+Feel free to fork this repository, make changes, and submit a pull request! Your contributions are welcome. 💡  
