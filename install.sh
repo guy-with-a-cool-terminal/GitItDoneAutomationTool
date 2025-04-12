@@ -19,7 +19,7 @@ pip install --upgrade pip
 pip install -r requirements.txt
 
 # update shebang
-VENV_PYTHON=$(realpath .venv/bin/python)
+VENV_PYTHON="$(pwd)/.venv/bin/python"
 echo "🔗 Updating shebang to use: $VENV_PYTHON"
 # Add or replace shebang
 if head -n 1 gititdone.py | grep -q "^#!"; then
