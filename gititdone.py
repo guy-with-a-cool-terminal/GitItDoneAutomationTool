@@ -135,7 +135,7 @@ def push_changes_to_remote(repo, remote_name, branch_name):
             if local_commit.hexsha != remote_commit.hexsha:
                 print(f"Local branch '{branch_name}' is out of sync with remote '{remote_name}'.")
                 print("Pulling latest changes to sync...")
-                repo.git.pull(remote_name, branch_name)
+                repo.git.pull(remote_name, branch_name,'--no-rebase')
                 print(f"Successfully pulled latest changes for branch '{branch_name}'.")
 
         # Push local changes to remote
