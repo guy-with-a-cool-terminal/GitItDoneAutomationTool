@@ -21,7 +21,13 @@ pip install -r requirements.txt
 # update shebang
 VENV_PYTHON=$(realpath .venv/bin/python)
 echo "🔗 Updating shebang to use: $VENV_PYTHON"
-sed -i "1s|^#!.*|#!$VENV_PYTHON|" gititdone.py
+# Add or replace shebang
+if head -n 1 gititdone.py | grep -q "^#!"; then
+    sed -i "1s|^#!.*|#!$VENV_PYTHON|" gititdone.py
+else
+    sed -i "1i#!$VENV_PYTHON" gititdone.py
+fi
+
 
 # make the script executable and copy it to /bin
 chmod +x gititdone.py
