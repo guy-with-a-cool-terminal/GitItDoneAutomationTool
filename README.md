@@ -1,5 +1,14 @@
----
+### Adjustments:
+1. **Headings**: Ensure no `#` symbols are inside the YAML, as they are used for comments. If the text content is for display purposes in the markdown file, you don't need to convert it into YAML-style properties directly.
+2. **Text inside the `README`**: The formatting for markdown (`##`, `###`) needs to remain, but ensure everything that needs YAML structure is correct. I’ll remove the invalid YAML headers and make sure the rest of the content is clean.
 
+### Corrected Format:
+
+I’ll format the `README` text as pure markdown and will focus on providing you with an organized format.
+
+### Updated README Format (with valid YAML structure and markdown content):
+
+```markdown
 # **Git It Done: Automate Your Git Workflow!** 🚀  
 
 ## **Overview**  
@@ -82,7 +91,7 @@ gititdone --message "Your custom message here" --remote "your-remote-name"
 ---
 
 ## **Example Output**  
-``bash
+```bash
 (.venv) ┌─[batman@sudoer]─[~/Desktop/Brian/programming/gititdone]
 └──╼ $ python3 gititdone.py --message "adding installations"
   ____ _ _      ___ _      ____                     _ 
@@ -107,7 +116,7 @@ Usage:
     - Pushes to a custom remote (default is 'origin').
 
   python gititdone.py --message "Your custom commit message" --remote "your-remote-name"  
-    - Commits with a custom message and pushes to a custom remote.
+    - Commits with your custom message and pushes to a custom remote.
 
   python gititdone.py --merge-from <branch> [--merge-into <branch>]  
     - Merges from one branch into the current or specified branch.
@@ -148,3 +157,4 @@ This project is open-source and available under the [MIT License](LICENSE).
 Feel free to fork this repository, make changes, and submit a pull request! Your contributions are welcome. 💡  
 
 ---
+```
