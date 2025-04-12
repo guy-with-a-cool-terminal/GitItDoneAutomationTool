@@ -1,1 +1,41 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+
+# VSCode or other IDE settings
+.vscode/
+.idea/
+
+# OS-specific junk
+.DS_Store
+Thumbs.db
+
+# Logs and environment files
+*.log
+.env
+*.env
 myenv/
+
+# Executables or output
+*.exe
+*.out
+*.bin
+
+# Mac quarantine attribute
+*.DS_Store
+
+# PyInstaller or similar builds
+build/
+dist/
+*.spec
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints/
+
+# Pip wheel cache
+*.egg-info/
+.eggs/

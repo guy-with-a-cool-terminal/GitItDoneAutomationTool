@@ -1,3 +1,5 @@
+---
+
 # **Git It Done: Automate Your Git Workflow!** 🚀  
 
 ## **Overview**  
@@ -21,105 +23,33 @@ git clone <repository_url>
 cd <repository_directory>
 ```
 
-### **2️⃣ Install Dependencies**  
-Make sure you have Python installed. Then, install the required packages:  
+### **2️⃣ Automatic Setup with Virtual Environment**  
+
+To get started with zero configuration, just run the install script for your platform:
+
+#### 🔹 **Linux/macOS**
 ```bash
-pip install -r requirements.txt
+bash install.sh
 ```
 
----
+This will:
+- Create a virtual environment in `.venv/`
+- Install all required dependencies
+- Update the shebang in `gititdone.py` to point to the venv’s Python
+- Make `gititdone` globally accessible from the terminal
 
-## **Making `gititdone.py` Executable from Anywhere**  
+#### 🔹 **Windows (PowerShell)**
+```powershell
+./install.ps1
+```
 
-### **🔹 Linux/macOS**  
+This will:
+- Create a virtual environment in `.venv\`
+- Install all dependencies
+- Patch the script’s shebang or execution path
+- Add an alias `gititdone` to your PowerShell profile for global use
 
-#### **Option 1: System-Wide Installation (Without Virtual Environment)**  
-1. **Ensure the script has a proper shebang** (edit `gititdone.py` and add this at the top if missing):  
-   ```python
-   #!/usr/bin/env python3
-   ```
-2. **Make the script executable**:  
-   ```bash
-   chmod +x gititdone.py
-   ```
-3. **Move it to `/usr/local/bin/` to make it globally accessible**:  
-   ```bash
-   sudo mv gititdone.py /usr/local/bin/gititdone
-   ```
-4. **Run it from anywhere**:  
-   ```bash
-   gititdone
-   ```
-
----
-
-#### **Option 2: Using a Virtual Environment**  
-If you want to run `gititdone.py` inside a **virtual environment**, follow these steps:  
-
-1. **Create and activate a virtual environment** (if not already done):  
-   ```bash
-   python3 -m venv myenv
-   source myenv/bin/activate
-   ```
-2. **Install dependencies inside the virtual environment**:  
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. **Find the path to your virtual environment’s Python**:  
-   ```bash
-   which python3
-   ```
-   Example output:  
-   ```bash
-   /home/your-username/path/to/myenv/bin/python3
-   ```
-4. **Edit the shebang in `gititdone.py` to use the virtual environment’s Python**:  
-   Open `gititdone.py` and replace the first line with:  
-   ```python
-   #!/home/your-username/path/to/myenv/bin/python3
-   ```
-5. **Make the script executable**:  
-   ```bash
-   chmod +x gititdone.py
-   ```
-6. **Move it to `/usr/local/bin/` to use it globally**:  
-   ```bash
-   sudo mv gititdone.py /usr/local/bin/gititdone
-   ```
-7. **Run it as a command**:  
-   ```bash
-   gititdone
-   ```
-
----
-
-### **🔹 Windows**  
-
-#### **Method 1: Add It to PATH**  
-1. **Move the script to a fixed location**, e.g., `C:\git-tools\`.  
-2. **Add that folder to the system `PATH`**:  
-   - Search *Environment Variables* in the Windows search bar.  
-   - Click *Edit the system environment variables* → *Environment Variables*.  
-   - Under *System Variables*, find `Path`, click *Edit*, then *New*, and add `C:\git-tools\`.  
-3. **Rename the file** to `gititdone.py` and now you can run:  
-   ```powershell
-   gititdone.py
-   ```
-
-#### **Method 2: Create a `.bat` Wrapper**  
-If you want to run the script without typing `.py`:  
-
-1. **Create a `gititdone.bat` file** in `C:\git-tools\` with the following content:  
-   ```bat
-   @echo off
-   python "C:\git-tools\gititdone.py" %*
-   ```
-2. **Move `gititdone.bat` to a folder in PATH** (like `C:\Windows\`).  
-3. Now, you can just type:  
-   ```powershell
-   gititdone
-   ```
-   from anywhere! 🚀  
+> ⚠️ Note: Ensure PowerShell execution policy allows script execution (`Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`).
 
 ---
 
@@ -152,9 +82,9 @@ gititdone --message "Your custom message here" --remote "your-remote-name"
 ---
 
 ## **Example Output**  
-```bash
-(myenv) ┌─[batman@sudoer]─[~/Desktop/Brian/programming/gititdone]
-└──╼ $ gititdone
+``bash
+(.venv) ┌─[batman@sudoer]─[~/Desktop/Brian/programming/gititdone]
+└──╼ $ python3 gititdone.py --message "adding installations"
   ____ _ _      ___ _      ____                     _ 
  / ___(_) |_   |_ _| |_   |  _ \  ___  _ __   ___  | |
 | |  _| | __|   | || __|  | | | |/ _ \| '_ \ / _ \ | |
@@ -162,26 +92,41 @@ gititdone --message "Your custom message here" --remote "your-remote-name"
  \____|_|\__|  |___|\__|  |____/ \___/|_| |_|\___| (_)
                                                       
 
-Welcome to automate Git and rest a bit :) Get it?
-This tool automates the process of committing and pushing changes to your git repository.
+Welcome to GitDone! 😊  
+This tool automates the process of committing and pushing changes to your Git repository.  
 You can use it as follows:
 
 Usage:
-  gititdone                - Commits all changes and pushes to the current branch with a default message.
-  gititdone --message "Your custom commit message" - Commits with your custom message.
-  gititdone --remote "your-remote-name"          - Pushes to a custom remote (default is 'origin').
-  gititdone --message "Your custom commit message" --remote "your-remote-name"
-                               - Commits with a custom message and pushes to a custom remote.
+  python gititdone.py  
+    - Commits all changes and pushes to the current branch with a default message.
 
-Changes committed with message: 'Automated commit - 2025-01-25 11:21:23'
-```
+  python gititdone.py --message "Your custom commit message"  
+    - Commits with your custom message.
+
+  python gititdone.py --remote "your-remote-name"  
+    - Pushes to a custom remote (default is 'origin').
+
+  python gititdone.py --message "Your custom commit message" --remote "your-remote-name"  
+    - Commits with a custom message and pushes to a custom remote.
+
+  python gititdone.py --merge-from <branch> [--merge-into <branch>]  
+    - Merges from one branch into the current or specified branch.
+
+Make sure your repository is clean and ready for commit before running this tool.
+
+Changes committed with message: 'adding installations'  
+Fetched latest updates from remote 'origin'.  
+Local branch 'beta' is out of sync with remote 'origin'.  
+Pulling latest changes to sync...  
+Successfully pulled latest changes for branch 'beta'.  
+Changes successfully pushed to origin/beta.  
 
 ---
 
 ## **Requirements**  
 - Python 3.6 or later  
 - Git installed and configured  
-- Python modules:  
+- Python modules (installed automatically):  
   - `gitpython`  
   - `pyfiglet`  
 
@@ -201,3 +146,5 @@ This project is open-source and available under the [MIT License](LICENSE).
 
 ## **Contributing**  
 Feel free to fork this repository, make changes, and submit a pull request! Your contributions are welcome. 💡  
+
+---
