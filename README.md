@@ -1,5 +1,3 @@
-Alright, here's your updated `README.md` with the **new automatic setup using virtual environments**, complete with platform-specific setup scripts (`install.sh` for Linux/macOS and `install.ps1` for Windows). I’ve preserved everything else as-is and swapped out the manual setup instructions with the new auto-setup.
-
 ---
 
 # **Git It Done: Automate Your Git Workflow!** 🚀  
@@ -84,9 +82,9 @@ gititdone --message "Your custom message here" --remote "your-remote-name"
 ---
 
 ## **Example Output**  
-```bash
+``bash
 (.venv) ┌─[batman@sudoer]─[~/Desktop/Brian/programming/gititdone]
-└──╼ $ gititdone
+└──╼ $ python3 gititdone.py --message "adding installations"
   ____ _ _      ___ _      ____                     _ 
  / ___(_) |_   |_ _| |_   |  _ \  ___  _ __   ___  | |
 | |  _| | __|   | || __|  | | | |/ _ \| '_ \ / _ \ | |
@@ -94,19 +92,34 @@ gititdone --message "Your custom message here" --remote "your-remote-name"
  \____|_|\__|  |___|\__|  |____/ \___/|_| |_|\___| (_)
                                                       
 
-Welcome to automate Git and rest a bit :) Get it?
-This tool automates the process of committing and pushing changes to your git repository.
+Welcome to GitDone! 😊  
+This tool automates the process of committing and pushing changes to your Git repository.  
 You can use it as follows:
 
 Usage:
-  gititdone                - Commits all changes and pushes to the current branch with a default message.
-  gititdone --message "Your custom commit message" - Commits with your custom message.
-  gititdone --remote "your-remote-name"          - Pushes to a custom remote (default is 'origin').
-  gititdone --message "Your custom commit message" --remote "your-remote-name"
-                               - Commits with a custom message and pushes to a custom remote.
+  python gititdone.py  
+    - Commits all changes and pushes to the current branch with a default message.
 
-Changes committed with message: 'Automated commit - 2025-01-25 11:21:23'
-```
+  python gititdone.py --message "Your custom commit message"  
+    - Commits with your custom message.
+
+  python gititdone.py --remote "your-remote-name"  
+    - Pushes to a custom remote (default is 'origin').
+
+  python gititdone.py --message "Your custom commit message" --remote "your-remote-name"  
+    - Commits with a custom message and pushes to a custom remote.
+
+  python gititdone.py --merge-from <branch> [--merge-into <branch>]  
+    - Merges from one branch into the current or specified branch.
+
+Make sure your repository is clean and ready for commit before running this tool.
+
+Changes committed with message: 'adding installations'  
+Fetched latest updates from remote 'origin'.  
+Local branch 'beta' is out of sync with remote 'origin'.  
+Pulling latest changes to sync...  
+Successfully pulled latest changes for branch 'beta'.  
+Changes successfully pushed to origin/beta.  
 
 ---
 
