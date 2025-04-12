@@ -27,7 +27,6 @@ except git.exc.InvalidGitRepositoryError as e:
         repo_path = os.getcwd()  # use current directory for new repo
         repo = git.Repo.init(repo_path)
         print("initialized new repository in:", repo_path)
-        repo = git.Repo(repo_path)
         print("repository object created successfully")
     else:
         exit(1)
@@ -79,6 +78,34 @@ print_welcome_message()
 
 #  Get the current branch name
 current_branch = repo.active_branch.name
+
+def handle_protected_branch_push(repo, remote_name, target_branch):
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    temp_branch_name = f"merge-{target_branch}-auto-{timestamp}"
+    print(f"Creating temporary branch '{temp_branch_name}' for pull request...")
+
+    repo.git.checkout('-b', temp_branch_name)
+
+    try:
+        repo.git.push(remote_name, temp_branch_name)
+        print(f"Branch '{temp_branch_name}' pushed to remote '{remote_name}'.")
+
+        remote_url = repo.remotes[remote_name].url
+        if remote_url.endswith(".git"):
+            remote_url = remote_url[:-4]
+        if remote_url.startswith("git@github.com:"):
+            remote_url = remote_url.replace("git@github.com:", "https://github.com/")
+
+        pr_url = f"{remote_url}/compare/{target_branch}...{temp_branch_name}"
+        print("\n🔔 ACTION NEEDED:")
+        print(f"➡️  Please create a pull request: {pr_url}\n")
+
+    except GitCommandError as push_error:
+        print(f"Failed to push temporary branch: {push_error}")
+        exit(1)
+    finally:
+        repo.git.checkout(target_branch)
+        
 def push_changes_to_remote(repo, remote_name, branch_name):
     try:
         # Find the remote
@@ -116,8 +143,12 @@ def push_changes_to_remote(repo, remote_name, branch_name):
         print(f"Changes successfully pushed to {remote_name}/{branch_name}.")
 
     except GitCommandError as e:
-        print(f"Error during push operation: {e}")
-        exit(1)
+        if "push declined due to repository rule violations" in str(e):
+            print("Push blocked due to branch protection rules.")
+            handle_protected_branch_push(repo, remote_name, branch_name)
+        else:
+            print(f"Push error: {e}")
+            exit(1)
 
 # handle merge logic if --merge-from is used
 if args.merge_from:
@@ -130,8 +161,8 @@ if args.merge_from:
         
         # stash uncommitted changes
         if repo.is_dirty(untracked_files=True):
-            print("Uncommitted changes detected. Stashing them temporarily...")
-            repo.git.stash('save','Auto-stash before merge')
+            print("stashing uncommitted changes...")
+            repo.git.stash('push', '-m', 'Auto-stash before merge')
 
         # checkout target branch if not already on it
         if repo.active_branch.name != target_branch:
@@ -153,7 +184,7 @@ if args.merge_from:
             repo.git.checkout(from_branch)
             repo.git.pull(args.remote, from_branch)
             repo.git.checkout(target_branch)  # back to target branch
-
+        
         # merge   
         repo.git.merge(from_branch)
         print(f"Successfully merged '{from_branch}' into '{target_branch}'.")
@@ -177,16 +208,16 @@ if args.merge_from:
     except GitCommandError as e:
         print(f"Error during merge: {e}")
         exit(1)
-
+        
+    exit(0)
+# if no merge proceed with commit && push
 repo.git.add(A=True)
-
-# commit changes
 commit_message = get_commit_message(args.message)
 try:
     repo.index.commit(commit_message)
     print(f"\nChanges committed with message: '{commit_message}'")
 except GitCommandError as e:
-    print(f"error during commit: {e}")
+    print(f"commit failed:{e}")
     exit(1)
 
 # push current branch to remote
