@@ -1,13 +1,3 @@
-### Adjustments:
-1. **Headings**: Ensure no `#` symbols are inside the YAML, as they are used for comments. If the text content is for display purposes in the markdown file, you don't need to convert it into YAML-style properties directly.
-2. **Text inside the `README`**: The formatting for markdown (`##`, `###`) needs to remain, but ensure everything that needs YAML structure is correct. I’ll remove the invalid YAML headers and make sure the rest of the content is clean.
-
-### Corrected Format:
-
-I’ll format the `README` text as pure markdown and will focus on providing you with an organized format.
-
-### Updated README Format (with valid YAML structure and markdown content):
-
 ```markdown
 # **Git It Done: Automate Your Git Workflow!** 🚀  
 
