@@ -1,5 +1,5 @@
 
-# **Git It Done: Automate Your Git Workflow!** 🚀  
+# **Git It Done: Automate Your Git Workflow!** 
 
 ## **Overview**  
 **Git It Done** is a Python-based tool designed to simplify your Git workflow. With just a single command, you can automate the process of committing and pushing your changes to a Git repository. Whether you're in the middle of a fast-paced development cycle or just want to save time, this tool has you covered.  
