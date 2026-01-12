@@ -1,5 +1,5 @@
-```markdown
-# **Git It Done: Automate Your Git Workflow!** 🚀  
+
+# **Git It Done: Automate Your Git Workflow!** 
 
 ## **Overview**  
 **Git It Done** is a Python-based tool designed to simplify your Git workflow. With just a single command, you can automate the process of committing and pushing your changes to a Git repository. Whether you're in the middle of a fast-paced development cycle or just want to save time, this tool has you covered.  
@@ -20,7 +20,6 @@
 ```bash
 git clone <repository_url>
 cd <repository_directory>
-```
 
 ### **2️⃣ Automatic Setup with Virtual Environment**  
 
@@ -119,7 +118,7 @@ Local branch 'beta' is out of sync with remote 'origin'.
 Pulling latest changes to sync...  
 Successfully pulled latest changes for branch 'beta'.  
 Changes successfully pushed to origin/beta.  
-
+```
 ---
 
 ## **Requirements**  
@@ -147,4 +146,4 @@ This project is open-source and available under the [MIT License](LICENSE).
 Feel free to fork this repository, make changes, and submit a pull request! Your contributions are welcome. 💡  
 
 ---
-```
+
