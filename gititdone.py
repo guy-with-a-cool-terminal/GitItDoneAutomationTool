@@ -1,3 +1,4 @@
+#!/home/Bri/Desktop/Brian/programming/gititdone/.venv/bin/python
 import os
 import git
 import argparse
